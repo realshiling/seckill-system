@@ -1,0 +1,12 @@
+mysql:
+  host: localhost
+  port: 3307
+  user: "root"
+  password: "root"
+  db: "seckill"
+
+redis:
+  addr: "127.0.0.1:6379"
+
+rabbitmq:
+  url: "amqp://admin:admin@127.0.0.1:5672/"
