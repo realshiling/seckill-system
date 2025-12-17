@@ -6,16 +6,45 @@ import (
 	"seckill-system/internal/model"
 	mqPkg "seckill-system/internal/pkg/mq"
 	redisPkg "seckill-system/internal/pkg/redis"
+	"time"
 
 	"github.com/streadway/amqp"
 )
 
 type SeckillService struct{}
 
+// 限流检查
+func (s *SeckillService) RateLimitCheck(userID uint, productID uint) (bool, int, error) {
+	//1.构建限流key
+	ratelimitkey := fmt.Sprintf("ratelimit:user:%d:product:%d", userID, productID)
+
+	//2.使用redis的incr命令进行限流计数
+	count, err := redisPkg.RDB.Incr(redisPkg.Ctx, ratelimitkey).Result()
+	if err != nil {
+		return false, 0, err
+	}
+
+	//3.设置key的过期时间为1分钟
+	if count == 1 {
+		redisPkg.RDB.Expire(redisPkg.Ctx, ratelimitkey, 1*time.Second)
+	}
+
+	//每秒最多一次请求
+	maxRequestPerSecond := int64(1)
+	remaining := maxRequestPerSecond - count
+
+	if count > maxRequestPerSecond {
+		return false, 0, nil
+	}
+
+	return true, int(remaining), nil
+}
+
 func (s *SeckillService) StartSeckill(productID uint, userID uint) error {
 	//1.检查用户是否已经购买
 	orderKey := fmt.Sprintf("user:product:%d:%d", userID, productID)
 	if redisPkg.RDB.Exists(redisPkg.Ctx, orderKey).Val() > 0 {
+		redisPkg.RDB.Incr(redisPkg.Ctx, orderKey)
 		return fmt.Errorf("already purchased")
 	}
 
