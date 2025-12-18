@@ -42,7 +42,7 @@ func main() {
 	r := gin.Default()
 
 	//创建Product处理器实例
-	productService := service.ProductService{
+	productService := &service.ProductService{
 		DB: db,
 	}
 	//启动回灌：DB-->Redis库存协程
@@ -50,7 +50,7 @@ func main() {
 		panic(fmt.Errorf("sync stock to redis failed: %s", err))
 	}
 	productHandler := &handler.ProductHandler{
-		ProductService: &productService,
+		ProductService: productService,
 	}
 
 	//创建User处理器实例

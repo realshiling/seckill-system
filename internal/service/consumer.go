@@ -28,12 +28,12 @@ func (oc *OrderConsumer) Start() {
 	// 启动订单消费逻辑
 	msgs, err := mqPkg.Channel.Consume(
 		mqPkg.QueueName, // queue
-		"",              // consumer
-		false,           // auto-ack
-		false,           // exclusive
-		false,           // no-local
-		false,           // no-wait
-		nil,             // args
+		"",              // consumer	消费者标识符
+		false,           // auto-ack	自动确认模式
+		false,           // exclusive	排他性
+		false,           // no-local	不接受本地消息
+		false,           // no-wait		不等待
+		nil,             // args		额外参数
 	)
 	if err != nil {
 		log.Fatalf("Failed to register consumer: %v", err)
@@ -68,7 +68,7 @@ func (oc *OrderConsumer) handleMessage(body []byte) error {
 		return nil
 	}
 
-	//没找到订单，创建新订单
+	//数据库错误
 	if err != gorm.ErrRecordNotFound {
 		// 数据库查询失败
 		return fmt.Errorf("查询订单失败: %v", err)

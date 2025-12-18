@@ -44,7 +44,6 @@ func (s *SeckillService) StartSeckill(productID uint, userID uint) error {
 	//1.检查用户是否已经购买
 	orderKey := fmt.Sprintf("user:product:%d:%d", userID, productID)
 	if redisPkg.RDB.Exists(redisPkg.Ctx, orderKey).Val() > 0 {
-		redisPkg.RDB.Incr(redisPkg.Ctx, orderKey)
 		return fmt.Errorf("already purchased")
 	}
 
