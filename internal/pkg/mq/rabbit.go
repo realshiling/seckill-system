@@ -2,6 +2,7 @@ package mq
 
 import (
 	"log"
+	"time"
 
 	"github.com/spf13/viper"
 	"github.com/streadway/amqp"
@@ -17,11 +18,19 @@ var (
 func InitRabbitMQ() {
 	url := viper.GetString("rabbitmq.url")
 
-	// 建立连接
+	// 建立连接（带重试机制）
 	var err error
-	Conn, err = amqp.Dial(url)
+	for i := 0; i < 3; i++ {
+		Conn, err = amqp.Dial(url)
+		if err == nil {
+			break
+		}
+		log.Printf("Failed to connect to RabbitMQ (attempt %d/3): %v", i+1, err)
+		time.Sleep(2 * time.Second)
+	}
+
 	if err != nil {
-		log.Fatalf("Failed to connect to RabbitMQ: %v", err)
+		log.Fatalf("Failed to connect to RabbitMQ after 3 attempts: %v", err)
 	}
 
 	// 创建通道
@@ -43,7 +52,9 @@ func InitRabbitMQ() {
 		log.Fatalf("Failed to declare a queue: %v", err)
 	}
 
-	log.Println("RabbitMQ initiallized successfully")
+	log.Println("✅ RabbitMQ initialized successfully")
+	log.Println("   - Queue:", QueueName)
+	log.Println("   - Durable: true")
 }
 
 func Close() {
@@ -53,4 +64,5 @@ func Close() {
 	if Conn != nil {
 		Conn.Close()
 	}
+	log.Println("RabbitMQ connections closed")
 }

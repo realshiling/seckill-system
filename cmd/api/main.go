@@ -97,3 +97,68 @@ func main() {
 	// 启动服务器
 	r.Run(":8080")
 }
+
+/*
+	// 🔧 健康检查接口
+	r.GET("/health", func(c *gin.Context) {
+		health := gin.H{
+			"status": "ok",
+			"timestamp": time.Now().Unix(),
+		}
+
+		// 检查Redis
+		if _, err := redisPkg.RDB.Ping(redisPkg.Ctx).Result(); err != nil {
+			health["redis"] = "unhealthy: " + err.Error()
+			c.JSON(503, health)
+			return
+		}
+		health["redis"] = "ok"
+
+		// 检查MySQL
+		sqlDB, _ := db.DB()
+		if err := sqlDB.Ping(); err != nil {
+			health["mysql"] = "unhealthy: " + err.Error()
+			c.JSON(503, health)
+			return
+		}
+		health["mysql"] = "ok"
+
+		// 检查RabbitMQ
+		if mqPkg.Conn == nil || mqPkg.Conn.IsClosed() {
+			health["rabbitmq"] = "unhealthy: connection closed"
+			c.JSON(503, health)
+			return
+		}
+		health["rabbitmq"] = "ok"
+
+		c.JSON(200, health)
+	})
+
+	// 🔧 监控接口：获取系统统计信息
+	r.GET("/stats", func(c *gin.Context) {
+		stats := gin.H{
+			"timestamp": time.Now().Unix(),
+		}
+
+		// Redis统计
+		redisInfo, _ := redisPkg.RDB.Info(redisPkg.Ctx, "stats").Result()
+		stats["redis"] = redisInfo
+
+		// MySQL统计
+		sqlDB, _ := db.DB()
+		dbStats := sqlDB.Stats()
+		stats["mysql"] = gin.H{
+			"open_connections": dbStats.OpenConnections,
+			"in_use":          dbStats.InUse,
+			"idle":            dbStats.Idle,
+		}
+
+		c.JSON(200, stats)
+	})
+
+	// 启动服务器
+	fmt.Println("🚀 Server starting on :8080")
+	fmt.Println("   Health: http://localhost:8080/health")
+	fmt.Println("   Stats:  http://localhost:8080/stats")
+	r.Run(":8080")
+*/
