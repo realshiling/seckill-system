@@ -9,6 +9,7 @@ import (
 	redisPkg "seckill-system/internal/pkg/redis"
 	"seckill-system/internal/service"
 	"seckill-system/internal/utils"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -94,15 +95,10 @@ func main() {
 		c.JSON(200, gin.H{"message": "秒杀成功"})
 	})
 
-	// 启动服务器
-	r.Run(":8080")
-}
-
-/*
 	// 🔧 健康检查接口
 	r.GET("/health", func(c *gin.Context) {
 		health := gin.H{
-			"status": "ok",
+			"status":    "ok",
 			"timestamp": time.Now().Unix(),
 		}
 
@@ -149,8 +145,8 @@ func main() {
 		dbStats := sqlDB.Stats()
 		stats["mysql"] = gin.H{
 			"open_connections": dbStats.OpenConnections,
-			"in_use":          dbStats.InUse,
-			"idle":            dbStats.Idle,
+			"in_use":           dbStats.InUse,
+			"idle":             dbStats.Idle,
 		}
 
 		c.JSON(200, stats)
@@ -161,4 +157,7 @@ func main() {
 	fmt.Println("   Health: http://localhost:8080/health")
 	fmt.Println("   Stats:  http://localhost:8080/stats")
 	r.Run(":8080")
-*/
+
+	// 启动服务器
+	r.Run(":8080")
+}
