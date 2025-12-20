@@ -1,5 +1,4 @@
-#dockerfile
-FROM golang:1.24-alpine AS builder
+FROM mirror.gcr.io/library/golang:1.24-alpine AS builder
 
 WORKDIR /app
 COPY . .
@@ -7,7 +6,7 @@ COPY . .
 RUN go mod download
 RUN go build -o seckill-server cmd/api/main.go
 
-FROM alpine:latest
+FROM mirror.gcr.io/library/alpine:latest
 WORKDIR /root/
 
 COPY --from=builder /app/seckill-server .

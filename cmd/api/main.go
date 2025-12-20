@@ -156,7 +156,6 @@ func main() {
 	fmt.Println("🚀 Server starting on :8080")
 	fmt.Println("   Health: http://localhost:8080/health")
 	fmt.Println("   Stats:  http://localhost:8080/stats")
-	r.Run(":8080")
 
 	// 启动服务器
 	r.Run(":8080")

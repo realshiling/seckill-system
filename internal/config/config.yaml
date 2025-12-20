@@ -1,6 +1,6 @@
 mysql:
   host: localhost
-  port: 3307
+  port: 3306
   user: "root"
   password: "root"
   db: "seckill"
@@ -9,4 +9,4 @@ redis:
   addr: "127.0.0.1:6379"
 
 rabbitmq:
-  url: "amqp://admin:admin@127.0.0.1:5672/"
+  url: "amqp://admin:admin@localhost:5672/"
