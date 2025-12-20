@@ -11,7 +11,7 @@ services:
       MYSQL_USER: user
       MYSQL_PASSWORD: password
     ports:
-      - "3307:3306"
+      - "3306:3306"
     command: [
       "--character-set-server=utf8mb4",
       "--collation-server=utf8mb4_general_ci",
@@ -41,6 +41,52 @@ services:
       - "15672:15672" # 管理界面 http://localhost:15672
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+
+  nginx:
+    image: nginx:alpine
+    container_name: seckill-nginx
+    ports:
+      - "80:80"      # 对外暴露80端口
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app1
+      - app2
+      - app3
+    restart: always
+
+  # 🆕 Go服务实例1
+  app1:
+    build: .
+    container_name: seckill-app1
+    environment:
+      - PORT=8080
+    depends_on:
+      - mysql
+      - redis
+      - rabbitmq
+
+  # 🆕 Go服务实例2
+  app2:
+    build: .
+    container_name: seckill-app2
+    environment:
+      - PORT=8080
+    depends_on:
+      - mysql
+      - redis
+      - rabbitmq
+
+  # 🆕 Go服务实例3
+  app3:
+    build: .
+    container_name: seckill-app3
+    environment:
+      - PORT=8080
+    depends_on:
+      - mysql
+      - redis
+      - rabbitmq
 
 volumes:
   mysql_data:
